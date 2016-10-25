@@ -18,17 +18,18 @@ int menuType = 0;
  5 = help
  */
 int startScreenLength = 1500;                //in ms
-int redraw = 0;
-int defaultLanguage = 1;
+int redraw = 0;                              //variable for redrawing if options were changed
+int defaultLanguage = 1;                     //Language, 1 = German, 0 = English
 //int mode = 0;                              //0 = Alkane, 1 = Alkene, 2 = Alkine, 3 = Aldehyde, 4 = Carboxylic acid, 5 = Alcohol
 int alpha = 35;
 float dx = cos(radians(alpha)) * 60;         // dx for angle; "-" for left bound; radians(36)
 float dy = sin(radians(alpha)) * 30;         // dy/2 for angle
-float methanHshiftx = sin(radians(60));
+float methanHshiftx = sin(radians(60));      
 float methanHshifty = cos(radians(60));
-String name;
-String false1;
-int C1=1;
+String name;                                 //names of molecules
+//Part of the false name generator
+String false1;                               //first false name
+int C1=1;                                  
 int false1positionAlkene;
 int false1positionAlkine;
 int false1positionAlcohol;
@@ -72,8 +73,8 @@ String helpTextL;
 
 //Alkane values (general values)
 int n = 0; //do not change
-int C = 1; //number of C atoms
-StringList nameAlkane;
+int C = 1; //number of C atoms                //Old input method
+StringList nameAlkane;                        //Meth, Eth, Prop etc
 
 
 //Alkene values
@@ -117,12 +118,6 @@ color f2from = f2;
 color f3to = f3;
 color f3from = f3;
 
-
-
-//button locks
-boolean lockf1 = false;
-boolean lockf2 = false;
-boolean lockf3 = false;
 //font
 
 //random pos
@@ -151,7 +146,7 @@ int falseCounter = 0;
 void setup() {
   smooth();
   orientation(PORTRAIT);
-  //load and save variables
+  //load and save variables (future feature)
   //Vectors for Generator go here
   v1 = new PVector(sin(radians(alpha)) * 8, sin(radians(alpha)) * 8);
   vy = new PVector(sin(radians(alpha)) * 8, -cos(radians(alpha)) * 8);
@@ -257,6 +252,7 @@ void setup() {
 //*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*
 void draw() {
   strokeWeight(1);
+  //Controllers
   Button playButton = (Button) cp5.getController("playButton");                                 //play button
   Button settingsButton = (Button) cp5.getController("settingsButton");                         //settings
   Button languageButton = (Button) cp5.getController("languageButton");                         //languages
@@ -350,7 +346,7 @@ void draw() {
   }
 //####################################################################################################################################################################################################################################################
   //BackButton 
-  if ((menuType == 2) || (menuType == 3)|| (menuType == 4)|| (menuType == 5)) {
+  if ((menuType == 2) || (menuType == 3)|| (menuType == 4)|| (menuType == 5)) { //should always show except main menu
     int backx, backy;
     int buttonWidth, buttonHeight;
     backx = 5;
@@ -385,7 +381,7 @@ void draw() {
     resetButton.show();
     resetButton.setSize(buttonWidth, buttonHeight);
     resetButton.setPosition(resetx, resety);
-    if((trueCounter == 0) && (falseCounter == 0)){
+    if((trueCounter == 0) && (falseCounter == 0)){          //locks the button if nothing has been done 
       resetButton.hide();
     }
   }  
@@ -604,7 +600,7 @@ void draw() {
     textSize(settingsBackgroundHeight/4);
     toggleAlkane.unlock();
     text(AlkaneL, textx, texty);
-    if(toggleAlkene.getValue() == 0 && toggleAlkine.getValue() == 0 && toggleAldehyde.getValue() == 0 && toggleAcid.getValue() == 0 && toggleAlkohole.getValue() == 0){
+    if(toggleAlkene.getValue() == 0 && toggleAlkine.getValue() == 0 && toggleAldehyde.getValue() == 0 && toggleAcid.getValue() == 0 && toggleAlkohole.getValue() == 0){ //Alkane should be enabled by default if nothing else is enabled
       toggleAlkane.setValue(true);
       toggleAlkane.lock();
     }
@@ -734,7 +730,7 @@ void draw() {
     int posy4 = posy3;
     int [][] randomPos = {{posx1, posy1}, {posx2, posy2}, {posx3, posy3}, {posx4, posy4}};
 
-    if (f1 != color(191, 87, 87)) {
+    if (f1 != color(191, 87, 87)) {        //was used for lerpcolor, not sure if needed now
       f1 = color(f1to);
     }
 
@@ -774,7 +770,6 @@ void draw() {
     falseButton2.setSize(buttonWidth, buttonHeight);                                           
     falseButton2.setPosition(randomPos[randomPos1.get(2)][0], randomPos[randomPos1.get(2)][1]);
     falseButton2.setColorBackground(f2);
-    falseButton2.setLock(lockf2);
     falseButton2.show();
 
 
@@ -783,15 +778,14 @@ void draw() {
     falseButton3.setSize(buttonWidth, buttonHeight);                                           
     falseButton3.setPosition(randomPos[randomPos1.get(3)][0], randomPos[randomPos1.get(3)][1]);
     falseButton3.setColorBackground(f3);
-    falseButton3.setLock(lockf3);
     falseButton3.show();
     
     
 
     pushMatrix();
     float changeScaleDisplayWidth1 = width/12/dx;
-    translate(width/2-((C-1)*cos(radians(alpha))*60)/2*changeScaleDisplayWidth1, height/2);
-    scale(changeScaleDisplayWidth1,changeScaleDisplayWidth1);
+    translate(width/2-((C-1)*cos(radians(alpha))*60)/2*changeScaleDisplayWidth1, height/2); //scale also scales the position, this translate is used to shift it back
+    scale(changeScaleDisplayWidth1,changeScaleDisplayWidth1);                               //scale to fit in any screen resolution 
     drawAlkane(n, 0, dy, dx, -dy);                                               //function Hexane(). n: always 0 (number of C (CHANGE THIS FOR OTHER!), starting value x,y, (differences between x), y2 (interchanged with y1 each consecutive))
     drawAlkene(n, positionAlkene, 0, dy, dx, -dy);
     drawAlkine(n, positionAlkine, 0, dy, dx, -dy);
@@ -925,6 +919,7 @@ void typeName(int mode, int C) {
 public void playButton() {
   menuType = 2;
   if (redraw == 0) {
+    //create array with chosen modes
     modeRandom = subset(modeRandom, 0, 0);
     if (Alkane == true) {
       modeRandom = splice(modeRandom, 0, 0);
@@ -946,12 +941,14 @@ public void playButton() {
     }
     int randomModeRandom = round(random(0, modeRandom.length-1));    //round?
     mode = modeRandom[randomModeRandom];
+    
+    //random chain length, mode 1 and 2 only allows for chain lengths 2 and up (alkene and alkyne)
     if (mode == 1 || mode == 2) {
       C = round(random(2, chainLength));
     } else {
       C = round(random(1, chainLength));
     }
-
+    //three different variables in the domain and different from C-creator
     int a, b, c;
     if (mode == 1 || mode == 2) {
       for (a = C; a == C; a = round(random(2, chainLength)));
@@ -976,7 +973,7 @@ public void playButton() {
     C3 = c;
     mode2 = mode;
     C3 = c;
-    positionAlkene = round(random(1, floor(C/2)));
+    positionAlkene = round(random(1, floor(C/2)));              //definition and parameters for the position of special stuff ... (e.g. functional groups of alcohol)
     false1positionAlkene = round(random(1, floor(C1/2)));
     false2positionAlkene = round(random(1, floor(C1/2)));
     false3positionAlkene = round(random(1, floor(C1/2)));
@@ -1203,9 +1200,9 @@ public void falseButton3() { //////////////////////////
 
 
 //Alkane
-void drawAlkane(int n, int x1, float y1, float dx, float y2) {
+void drawAlkane(int n, int x1, float y1, float dx, float y2) {          //further explanations in the matura project protocol
   if (mode == 0) {
-    if (C >= 2) {
+    if (C >= 2) {                                                       //ethan or higher
       for (; n < C - 1; n = n + 1) {
         strokeJoin(ROUND);
         beginShape(LINES);
@@ -1215,7 +1212,7 @@ void drawAlkane(int n, int x1, float y1, float dx, float y2) {
         text("test", width/2, height/2);
       }
     }
-    if (C == 1) {
+    if (C == 1) {                                                       //Methan need it's own function, as it's a different formula
       popMatrix();
       pushMatrix();
       float changeScaleDisplayWidth1 = width/12/dx;
@@ -1265,14 +1262,14 @@ void drawAlkene(int n, int positionAlkene, int x1, float y1, float dx, float y2)
       vertex(x1 + (n + 1) * dx, y1 * (+n % 2) + y2 * ((n + 1) % 2));
       endShape(CLOSE);
     }
-    if (C == 2){
+    if (C == 2){                                                                          //has to look slightly different
       beginShape(LINES);
         vertex(x1 + v1.x + realpositionAlkene * dx, y1 + v1.y);
         vertex(v1.x - x1 + (1 + realpositionAlkene) * dx, y2+v1.y);
         endShape();
     }else if (positionAlkene <= (C - C % 2) / 2) { //check for true value
       if (realpositionAlkene % 2 == 0) { //odd or even
-        beginShape(LINES);
+        beginShape(LINES);                                                                //special extra lines         
         vertex(x1 + v1.x + realpositionAlkene * dx, y1 + v1.y);
         vertex(v1.x - vy.x + x1 + (realpositionAlkene + 1) * dx, y2 - vy.y);
         endShape();
@@ -1326,7 +1323,8 @@ void drawAlkine(int n, int positionAlkine, int x1, float y1, float dx, float y2)
         vertex(x1 + (realpositionAlkine + 1) * dx + VAlkine.x, y1 * (realpositionAlkine % 2) + y2 * ((realpositionAlkine + 1) % 2) + yup.y + VAlkine.y);
         endShape(LINES);
       }
-      for (; n < realpositionAlkine; n = n + 1) {
+      //deformation
+      for (; n < realpositionAlkine; n = n + 1) { 
         strokeJoin(ROUND);
         beginShape(LINES);
         vertex(x1 + n * dx, y1 * ((n + 1) % 2) + y2 * (n % 2));
